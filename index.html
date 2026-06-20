@@ -1,0 +1,1013 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Plan de Mantenimiento — Maquinaria</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap');
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0f1117;
+    --surface: #181c27;
+    --surface2: #1e2333;
+    --border: #2a2f42;
+    --text: #e8eaf0;
+    --muted: #7a8099;
+    --green: #22c55e;
+    --green-dim: #166534;
+    --yellow: #f59e0b;
+    --yellow-dim: #78350f;
+    --red: #ef4444;
+    --red-dim: #7f1d1d;
+    --blue: #3b82f6;
+    --blue-dim: #1e3a5f;
+    --accent: #4ade80;
+  }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    font-size: 14px;
+  }
+
+  /* HEADER */
+  .header {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 16px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .header-left { display: flex; align-items: center; gap: 12px; }
+  .logo-icon {
+    width: 36px; height: 36px;
+    background: linear-gradient(135deg, #22c55e, #16a34a);
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
+  }
+  .header h1 { font-size: 16px; font-weight: 700; letter-spacing: -0.3px; }
+  .header p { font-size: 11px; color: var(--muted); margin-top: 1px; }
+  .header-right { display: flex; gap: 8px; align-items: center; }
+
+  /* LAYOUT */
+  .main { max-width: 1200px; margin: 0 auto; padding: 24px 16px; }
+
+  /* KPI BAR */
+  .kpi-bar {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+  .kpi-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px;
+    position: relative;
+    overflow: hidden;
+  }
+  .kpi-card::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0; height: 3px;
+  }
+  .kpi-card.green::before { background: var(--green); }
+  .kpi-card.yellow::before { background: var(--yellow); }
+  .kpi-card.red::before { background: var(--red); }
+  .kpi-card.blue::before { background: var(--blue); }
+  .kpi-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; }
+  .kpi-value { font-size: 28px; font-weight: 700; font-family: 'JetBrains Mono', monospace; margin-top: 4px; }
+  .kpi-card.green .kpi-value { color: var(--green); }
+  .kpi-card.yellow .kpi-value { color: var(--yellow); }
+  .kpi-card.red .kpi-value { color: var(--red); }
+  .kpi-card.blue .kpi-value { color: var(--blue); }
+
+  /* TABS */
+  .tabs { display: flex; gap: 4px; margin-bottom: 20px; border-bottom: 1px solid var(--border); padding-bottom: 0; }
+  .tab {
+    padding: 8px 18px;
+    background: none;
+    border: none;
+    color: var(--muted);
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -1px;
+    transition: all 0.15s;
+    font-family: 'Inter', sans-serif;
+  }
+  .tab:hover { color: var(--text); }
+  .tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+  /* TOOLBAR */
+  .toolbar {
+    display: flex; gap: 10px; align-items: center;
+    margin-bottom: 16px; flex-wrap: wrap;
+  }
+  .search-input {
+    flex: 1; min-width: 200px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 8px 12px;
+    color: var(--text);
+    font-size: 13px;
+    font-family: 'Inter', sans-serif;
+    outline: none;
+  }
+  .search-input:focus { border-color: var(--accent); }
+  .search-input::placeholder { color: var(--muted); }
+  select.filter-select {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 8px 12px;
+    color: var(--text);
+    font-size: 13px;
+    font-family: 'Inter', sans-serif;
+    cursor: pointer;
+    outline: none;
+  }
+  select.filter-select:focus { border-color: var(--accent); }
+
+  /* BTN */
+  .btn {
+    padding: 8px 16px;
+    border-radius: 8px;
+    border: none;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: 'Inter', sans-serif;
+    transition: opacity 0.15s, transform 0.1s;
+    white-space: nowrap;
+  }
+  .btn:active { transform: scale(0.97); }
+  .btn-primary { background: var(--green); color: #000; }
+  .btn-primary:hover { opacity: 0.9; }
+  .btn-danger { background: var(--red); color: #fff; }
+  .btn-danger:hover { opacity: 0.85; }
+  .btn-ghost {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    color: var(--text);
+  }
+  .btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
+  .btn-sm { padding: 5px 10px; font-size: 12px; }
+
+  /* TABLE */
+  .table-wrap {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+  table { width: 100%; border-collapse: collapse; }
+  thead th {
+    background: var(--surface2);
+    padding: 10px 14px;
+    text-align: left;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-bottom: 1px solid var(--border);
+    white-space: nowrap;
+  }
+  tbody tr { border-bottom: 1px solid var(--border); transition: background 0.1s; }
+  tbody tr:last-child { border-bottom: none; }
+  tbody tr:hover { background: var(--surface2); }
+  tbody td { padding: 11px 14px; font-size: 13px; vertical-align: middle; }
+
+  /* BADGES */
+  .badge {
+    display: inline-flex; align-items: center; gap: 5px;
+    padding: 3px 9px; border-radius: 20px;
+    font-size: 11px; font-weight: 600; white-space: nowrap;
+  }
+  .badge-green { background: #14532d; color: #86efac; }
+  .badge-yellow { background: #451a03; color: #fde68a; }
+  .badge-red { background: #450a0a; color: #fca5a5; }
+  .badge-blue { background: var(--blue-dim); color: #93c5fd; }
+  .badge-gray { background: #1f2937; color: var(--muted); }
+  .dot { width: 6px; height: 6px; border-radius: 50%; display: inline-block; }
+  .dot-green { background: var(--green); }
+  .dot-yellow { background: var(--yellow); }
+  .dot-red { background: var(--red); }
+
+  /* MODAL */
+  .modal-overlay {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.7);
+    z-index: 200;
+    display: flex; align-items: center; justify-content: center;
+    padding: 16px;
+    animation: fadeIn 0.15s ease;
+  }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  .modal {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 24px;
+    width: 100%; max-width: 520px;
+    max-height: 90vh;
+    overflow-y: auto;
+    animation: slideUp 0.15s ease;
+  }
+  @keyframes slideUp { from { transform: translateY(12px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+  .modal h2 { font-size: 16px; font-weight: 700; margin-bottom: 20px; }
+  .form-group { margin-bottom: 14px; }
+  .form-group label { display: block; font-size: 12px; font-weight: 600; color: var(--muted); margin-bottom: 5px; text-transform: uppercase; letter-spacing: 0.4px; }
+  .form-group input, .form-group select, .form-group textarea {
+    width: 100%;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 9px 12px;
+    color: var(--text);
+    font-size: 13px;
+    font-family: 'Inter', sans-serif;
+    outline: none;
+    transition: border-color 0.15s;
+  }
+  .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: var(--accent); }
+  .form-group textarea { resize: vertical; min-height: 70px; }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .modal-footer { display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--border); }
+
+  /* EMPTY STATE */
+  .empty { text-align: center; padding: 48px; color: var(--muted); }
+  .empty-icon { font-size: 36px; margin-bottom: 12px; }
+  .empty p { font-size: 14px; }
+
+  /* SECTION */
+  .section-title {
+    font-size: 12px; font-weight: 700; color: var(--muted);
+    text-transform: uppercase; letter-spacing: 0.6px;
+    margin-bottom: 12px; margin-top: 24px;
+  }
+
+  /* HISTORY LIST */
+  .hist-list { display: flex; flex-direction: column; gap: 8px; }
+  .hist-item {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px 14px;
+    display: flex; gap: 12px; align-items: flex-start;
+  }
+  .hist-date {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px; color: var(--accent);
+    white-space: nowrap; margin-top: 1px;
+  }
+  .hist-body { flex: 1; }
+  .hist-title { font-size: 13px; font-weight: 600; }
+  .hist-meta { font-size: 11px; color: var(--muted); margin-top: 3px; }
+
+  /* TOAST */
+  .toast {
+    position: fixed; bottom: 20px; right: 20px;
+    background: var(--green-dim);
+    border: 1px solid var(--green);
+    color: var(--green);
+    padding: 10px 18px;
+    border-radius: 8px;
+    font-size: 13px; font-weight: 600;
+    z-index: 999;
+    animation: slideUp 0.2s ease;
+  }
+
+  /* CHIPS */
+  .chip-row { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 16px; }
+  .chip {
+    padding: 4px 12px; border-radius: 20px;
+    font-size: 12px; font-weight: 500;
+    cursor: pointer; border: 1px solid var(--border);
+    background: var(--surface2); color: var(--muted);
+    transition: all 0.15s;
+  }
+  .chip.active { background: var(--accent); color: #000; border-color: var(--accent); font-weight: 700; }
+
+  /* RESPONSIVE */
+  @media (max-width: 640px) {
+    .kpi-bar { grid-template-columns: repeat(2, 1fr); }
+    .form-row { grid-template-columns: 1fr; }
+    .header h1 { font-size: 14px; }
+    tbody td, thead th { padding: 8px 10px; font-size: 12px; }
+    .hide-mobile { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-left">
+    <div class="logo-icon">🔧</div>
+    <div>
+      <h1>Plan de Mantenimiento</h1>
+      <p id="headerSub">Maquinaria · Celsia</p>
+    </div>
+  </div>
+  <div class="header-right">
+    <button class="btn btn-ghost btn-sm" onclick="exportCSV()">⬇ Exportar</button>
+    <button class="btn btn-primary btn-sm" onclick="openModal('task')">+ Nuevo</button>
+  </div>
+</div>
+
+<div class="main">
+  <!-- KPI BAR -->
+  <div class="kpi-bar">
+    <div class="kpi-card green">
+      <div class="kpi-label">Al día</div>
+      <div class="kpi-value" id="kpiOk">0</div>
+    </div>
+    <div class="kpi-card yellow">
+      <div class="kpi-label">Por vencer</div>
+      <div class="kpi-value" id="kpiWarn">0</div>
+    </div>
+    <div class="kpi-card red">
+      <div class="kpi-label">Vencidos</div>
+      <div class="kpi-value" id="kpiRed">0</div>
+    </div>
+    <div class="kpi-card blue">
+      <div class="kpi-label">Total tareas</div>
+      <div class="kpi-value" id="kpiTotal">0</div>
+    </div>
+  </div>
+
+  <!-- TABS -->
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab('tasks', this)">📋 Tareas</button>
+    <button class="tab" onclick="switchTab('machines', this)">🛠 Máquinas</button>
+    <button class="tab" onclick="switchTab('history', this)">📜 Historial</button>
+  </div>
+
+  <!-- TAB: TAREAS -->
+  <div id="tab-tasks">
+    <div class="toolbar">
+      <input class="search-input" id="searchTask" placeholder="Buscar tarea o máquina..." oninput="renderTasks()" />
+      <select class="filter-select" id="filterStatus" onchange="renderTasks()">
+        <option value="">Todos los estados</option>
+        <option value="ok">Al día</option>
+        <option value="warn">Por vencer</option>
+        <option value="red">Vencido</option>
+        <option value="pending">Pendiente</option>
+      </select>
+      <select class="filter-select" id="filterMech" onchange="renderTasks()">
+        <option value="">Todos los mecánicos</option>
+        <option>Nolberto</option>
+        <option>Henry</option>
+      </select>
+    </div>
+    <div class="chip-row" id="typeChips"></div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Máquina</th>
+            <th>Tarea</th>
+            <th class="hide-mobile">Frecuencia</th>
+            <th>Próximo</th>
+            <th>Estado</th>
+            <th>Mecánico</th>
+            <th>Acción</th>
+          </tr>
+        </thead>
+        <tbody id="taskBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- TAB: MÁQUINAS -->
+  <div id="tab-machines" style="display:none">
+    <div class="toolbar">
+      <input class="search-input" id="searchMachine" placeholder="Buscar máquina..." oninput="renderMachines()" />
+      <button class="btn btn-primary" onclick="openModal('machine')">+ Agregar máquina</button>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Nombre</th>
+            <th>Tipo</th>
+            <th class="hide-mobile">Marca / Modelo</th>
+            <th class="hide-mobile">N° Serie</th>
+            <th>Estado</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody id="machineBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- TAB: HISTORIAL -->
+  <div id="tab-history" style="display:none">
+    <div class="toolbar">
+      <input class="search-input" id="searchHist" placeholder="Buscar en historial..." oninput="renderHistory()" />
+      <select class="filter-select" id="filterHistMech" onchange="renderHistory()">
+        <option value="">Todos los mecánicos</option>
+        <option>Nolberto</option>
+        <option>Henry</option>
+      </select>
+    </div>
+    <div class="hist-list" id="histList"></div>
+  </div>
+</div>
+
+<!-- MODAL TAREA -->
+<div class="modal-overlay" id="modalTask" style="display:none" onclick="if(event.target===this)closeModal('task')">
+  <div class="modal">
+    <h2 id="modalTaskTitle">Nueva tarea de mantenimiento</h2>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Máquina *</label>
+        <select id="tMachine"></select>
+      </div>
+      <div class="form-group">
+        <label>Tipo de mantenimiento *</label>
+        <select id="tType">
+          <option>Preventivo</option>
+          <option>Correctivo</option>
+          <option>Limpieza</option>
+          <option>Lubricación</option>
+          <option>Afilado</option>
+          <option>Cambio de aceite</option>
+          <option>Cambio de filtro</option>
+          <option>Revisión general</option>
+          <option>Calibración</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Descripción de la tarea *</label>
+      <input type="text" id="tDesc" placeholder="Ej: Cambio de aceite motor 2T" />
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Mecánico asignado *</label>
+        <select id="tMech">
+          <option>Nolberto</option>
+          <option>Henry</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Frecuencia</label>
+        <select id="tFreq">
+          <option value="7">Semanal (7 días)</option>
+          <option value="15">Quincenal (15 días)</option>
+          <option value="30" selected>Mensual (30 días)</option>
+          <option value="60">Bimestral (60 días)</option>
+          <option value="90">Trimestral (90 días)</option>
+          <option value="180">Semestral (180 días)</option>
+          <option value="365">Anual (365 días)</option>
+          <option value="0">Sin repetición</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Fecha programada *</label>
+        <input type="date" id="tDate" />
+      </div>
+      <div class="form-group">
+        <label>Prioridad</label>
+        <select id="tPriority">
+          <option value="normal">Normal</option>
+          <option value="alta">Alta</option>
+          <option value="critica">Crítica</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Observaciones</label>
+      <textarea id="tNotes" placeholder="Insumos, repuestos, instrucciones especiales..."></textarea>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('task')">Cancelar</button>
+      <button class="btn btn-primary" onclick="saveTask()">Guardar tarea</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL MÁQUINA -->
+<div class="modal-overlay" id="modalMachine" style="display:none" onclick="if(event.target===this)closeModal('machine')">
+  <div class="modal">
+    <h2>Agregar / Editar máquina</h2>
+    <div class="form-group">
+      <label>Nombre *</label>
+      <input type="text" id="mName" placeholder="Ej: Guadaña #1" />
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Tipo *</label>
+        <select id="mType">
+          <option>Guadaña</option>
+          <option>Cortasetos</option>
+          <option>Hidrolavadora</option>
+          <option>Sopladora</option>
+          <option>Podadora</option>
+          <option>Motosierra</option>
+          <option>Otro</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Estado</label>
+        <select id="mStatus">
+          <option value="activa">Activa</option>
+          <option value="taller">En taller</option>
+          <option value="baja">Dada de baja</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Marca</label>
+        <input type="text" id="mBrand" placeholder="Ej: Stihl" />
+      </div>
+      <div class="form-group">
+        <label>Modelo</label>
+        <input type="text" id="mModel" placeholder="Ej: FS 38" />
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>N° Serie</label>
+        <input type="text" id="mSerial" placeholder="Opcional" />
+      </div>
+      <div class="form-group">
+        <label>Año / Fecha compra</label>
+        <input type="text" id="mYear" placeholder="Ej: 2022" />
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Observaciones</label>
+      <textarea id="mNotes" placeholder="Notas adicionales..."></textarea>
+    </div>
+    <input type="hidden" id="mEditId" value="" />
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('machine')">Cancelar</button>
+      <button class="btn btn-primary" onclick="saveMachine()">Guardar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL COMPLETAR -->
+<div class="modal-overlay" id="modalComplete" style="display:none" onclick="if(event.target===this)closeModal('complete')">
+  <div class="modal">
+    <h2>✅ Registrar intervención</h2>
+    <input type="hidden" id="cTaskId" />
+    <div class="form-group">
+      <label>Mecánico que realizó</label>
+      <select id="cMech">
+        <option>Nolberto</option>
+        <option>Henry</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>Fecha de ejecución</label>
+      <input type="date" id="cDate" />
+    </div>
+    <div class="form-group">
+      <label>Observaciones / Insumos usados</label>
+      <textarea id="cNotes" placeholder="Ej: Se cambió aceite 2T, se afiló cuchilla, repuesto: filtro de aire..."></textarea>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('complete')">Cancelar</button>
+      <button class="btn btn-primary" onclick="completeTask()">Registrar y reprogramar</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast" style="display:none"></div>
+
+<script>
+// ── STATE ──────────────────────────────────────────────────────
+const STORAGE_KEY = 'mant_data_v1';
+let state = { machines: [], tasks: [], history: [] };
+let editingTaskId = null;
+let activeTypeFilter = '';
+
+function loadState() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) state = JSON.parse(raw);
+  } catch(e) {}
+  if (!state.machines) state.machines = [];
+  if (!state.tasks) state.tasks = [];
+  if (!state.history) state.history = [];
+  // seed demo data if empty
+  if (state.machines.length === 0) seedDemo();
+}
+
+function saveState() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+}
+
+function seedDemo() {
+  const machines = [
+    { id: uid(), name: 'Guadaña #1', type: 'Guadaña', brand: 'Stihl', model: 'FS 38', serial: 'GU001', year: '2021', status: 'activa', notes: '' },
+    { id: uid(), name: 'Guadaña #2', type: 'Guadaña', brand: 'Husqvarna', model: '128R', serial: 'GU002', year: '2022', status: 'activa', notes: '' },
+    { id: uid(), name: 'Cortasetos #1', type: 'Cortasetos', brand: 'Stihl', model: 'HS 45', serial: 'CT001', year: '2020', status: 'activa', notes: '' },
+    { id: uid(), name: 'Hidrolavadora #1', type: 'Hidrolavadora', brand: 'Karcher', model: 'K5', serial: 'HL001', year: '2023', status: 'activa', notes: '' },
+    { id: uid(), name: 'Sopladora #1', type: 'Sopladora', brand: 'Echo', model: 'PB-250LN', serial: 'SP001', year: '2022', status: 'activa', notes: '' },
+  ];
+  state.machines = machines;
+
+  const today = new Date();
+  const d = (offset) => fmtDate(new Date(today.getTime() + offset * 86400000));
+
+  state.tasks = [
+    { id: uid(), machineId: machines[0].id, type: 'Preventivo', desc: 'Cambio de aceite motor 2T', mech: 'Nolberto', freq: 30, date: d(-5), priority: 'alta', notes: 'Aceite 2T Stihl', status: 'active' },
+    { id: uid(), machineId: machines[0].id, type: 'Afilado', desc: 'Afilado de cuchilla', mech: 'Henry', freq: 15, date: d(3), priority: 'normal', notes: '', status: 'active' },
+    { id: uid(), machineId: machines[1].id, type: 'Cambio de filtro', desc: 'Cambio filtro de aire', mech: 'Nolberto', freq: 60, date: d(12), priority: 'normal', notes: '', status: 'active' },
+    { id: uid(), machineId: machines[2].id, type: 'Lubricación', desc: 'Lubricación de cadena y cuchillas', mech: 'Henry', freq: 7, date: d(-2), priority: 'normal', notes: '', status: 'active' },
+    { id: uid(), machineId: machines[3].id, type: 'Revisión general', desc: 'Revisión mangueras y boquilla', mech: 'Nolberto', freq: 90, date: d(20), priority: 'normal', notes: '', status: 'active' },
+    { id: uid(), machineId: machines[4].id, type: 'Limpieza', desc: 'Limpieza filtro y paletas', mech: 'Henry', freq: 30, date: d(0), priority: 'normal', notes: '', status: 'active' },
+  ];
+  saveState();
+}
+
+// ── UTILS ──────────────────────────────────────────────────────
+function uid() { return Math.random().toString(36).slice(2,10); }
+function fmtDate(d) { return d.toISOString().slice(0,10); }
+function today() { return fmtDate(new Date()); }
+function daysDiff(dateStr) {
+  const t = new Date(today()); const d = new Date(dateStr);
+  return Math.round((d - t) / 86400000);
+}
+function getStatus(dateStr) {
+  const diff = daysDiff(dateStr);
+  if (diff < 0) return 'red';
+  if (diff <= 5) return 'warn';
+  return 'ok';
+}
+function getMachineName(id) {
+  const m = state.machines.find(m => m.id === id);
+  return m ? m.name : '—';
+}
+function getMachineType(id) {
+  const m = state.machines.find(m => m.id === id);
+  return m ? m.type : '';
+}
+
+// ── RENDER KPI ─────────────────────────────────────────────────
+function renderKPI() {
+  const active = state.tasks.filter(t => t.status === 'active');
+  const ok = active.filter(t => getStatus(t.date) === 'ok').length;
+  const warn = active.filter(t => getStatus(t.date) === 'warn').length;
+  const red = active.filter(t => getStatus(t.date) === 'red').length;
+  document.getElementById('kpiOk').textContent = ok;
+  document.getElementById('kpiWarn').textContent = warn;
+  document.getElementById('kpiRed').textContent = red;
+  document.getElementById('kpiTotal').textContent = active.length;
+}
+
+// ── TYPE CHIPS ─────────────────────────────────────────────────
+function renderChips() {
+  const types = [...new Set(state.tasks.filter(t=>t.status==='active').map(t=>t.type))];
+  const container = document.getElementById('typeChips');
+  container.innerHTML = `<span class="chip ${activeTypeFilter===''?'active':''}" onclick="setTypeFilter('')">Todos</span>` +
+    types.map(tp => `<span class="chip ${activeTypeFilter===tp?'active':''}" onclick="setTypeFilter('${tp}')">${tp}</span>`).join('');
+}
+function setTypeFilter(v) { activeTypeFilter = v; renderChips(); renderTasks(); }
+
+// ── RENDER TAREAS ──────────────────────────────────────────────
+function renderTasks() {
+  renderChips();
+  const q = document.getElementById('searchTask').value.toLowerCase();
+  const fs = document.getElementById('filterStatus').value;
+  const fm = document.getElementById('filterMech').value;
+  let rows = state.tasks.filter(t => t.status === 'active');
+
+  if (activeTypeFilter) rows = rows.filter(t => t.type === activeTypeFilter);
+  if (fs) rows = rows.filter(t => getStatus(t.date) === fs || (fs === 'pending' && t.status === 'pending'));
+  if (fm) rows = rows.filter(t => t.mech === fm);
+  if (q) rows = rows.filter(t =>
+    getMachineName(t.machineId).toLowerCase().includes(q) ||
+    t.desc.toLowerCase().includes(q) || t.type.toLowerCase().includes(q));
+
+  rows.sort((a,b) => daysDiff(a.date) - daysDiff(b.date));
+
+  const tbody = document.getElementById('taskBody');
+  if (!rows.length) { tbody.innerHTML = `<tr><td colspan="7"><div class="empty"><div class="empty-icon">✅</div><p>Sin tareas para mostrar</p></div></td></tr>`; return; }
+
+  tbody.innerHTML = rows.map(t => {
+    const diff = daysDiff(t.date);
+    const st = getStatus(t.date);
+    const badge = st === 'red'
+      ? `<span class="badge badge-red"><span class="dot dot-red"></span>Vencido ${Math.abs(diff)}d</span>`
+      : st === 'warn'
+      ? `<span class="badge badge-yellow"><span class="dot dot-yellow"></span>En ${diff}d</span>`
+      : `<span class="badge badge-green"><span class="dot dot-green"></span>En ${diff}d</span>`;
+    const prioBadge = t.priority === 'critica' ? ' <span class="badge badge-red" style="font-size:10px">CRÍTICA</span>'
+      : t.priority === 'alta' ? ' <span class="badge badge-yellow" style="font-size:10px">ALTA</span>' : '';
+    const freqLabel = t.freq == 0 ? 'Única vez' : t.freq == 7 ? 'Semanal' : t.freq == 15 ? 'Quincenal'
+      : t.freq == 30 ? 'Mensual' : t.freq == 60 ? 'Bimestral' : t.freq == 90 ? 'Trimestral'
+      : t.freq == 180 ? 'Semestral' : 'Anual';
+
+    return `<tr>
+      <td><strong>${getMachineName(t.machineId)}</strong><br><span style="color:var(--muted);font-size:11px">${getMachineType(t.machineId)}</span></td>
+      <td>${t.desc}${prioBadge}<br><span style="color:var(--muted);font-size:11px">${t.type}</span></td>
+      <td class="hide-mobile" style="color:var(--muted)">${freqLabel}</td>
+      <td style="font-family:'JetBrains Mono',monospace;font-size:12px">${t.date}</td>
+      <td>${badge}</td>
+      <td><span class="badge badge-blue">${t.mech}</span></td>
+      <td>
+        <div style="display:flex;gap:6px">
+          <button class="btn btn-primary btn-sm" onclick="openComplete('${t.id}')">✓ Hecho</button>
+          <button class="btn btn-ghost btn-sm" onclick="editTask('${t.id}')">✏</button>
+          <button class="btn btn-danger btn-sm" onclick="deleteTask('${t.id}')">🗑</button>
+        </div>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+// ── RENDER MÁQUINAS ────────────────────────────────────────────
+function renderMachines() {
+  const q = document.getElementById('searchMachine').value.toLowerCase();
+  let rows = state.machines.filter(m => !q || m.name.toLowerCase().includes(q) || m.type.toLowerCase().includes(q));
+  const tbody = document.getElementById('machineBody');
+  if (!rows.length) { tbody.innerHTML = `<tr><td colspan="6"><div class="empty"><div class="empty-icon">🔧</div><p>Sin máquinas registradas</p></div></td></tr>`; return; }
+  tbody.innerHTML = rows.map(m => {
+    const stBadge = m.status === 'activa' ? `<span class="badge badge-green">Activa</span>`
+      : m.status === 'taller' ? `<span class="badge badge-yellow">En taller</span>`
+      : `<span class="badge badge-gray">Baja</span>`;
+    const taskCount = state.tasks.filter(t => t.machineId === m.id && t.status === 'active').length;
+    return `<tr>
+      <td><strong>${m.name}</strong><br><span style="color:var(--muted);font-size:11px">${taskCount} tarea(s) activa(s)</span></td>
+      <td><span class="badge badge-blue">${m.type}</span></td>
+      <td class="hide-mobile">${[m.brand, m.model].filter(Boolean).join(' / ') || '—'}</td>
+      <td class="hide-mobile" style="color:var(--muted);font-family:'JetBrains Mono',monospace;font-size:11px">${m.serial || '—'}</td>
+      <td>${stBadge}</td>
+      <td>
+        <div style="display:flex;gap:6px">
+          <button class="btn btn-ghost btn-sm" onclick="editMachine('${m.id}')">✏ Editar</button>
+          <button class="btn btn-danger btn-sm" onclick="deleteMachine('${m.id}')">🗑</button>
+        </div>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+// ── RENDER HISTORIAL ───────────────────────────────────────────
+function renderHistory() {
+  const q = document.getElementById('searchHist').value.toLowerCase();
+  const fm = document.getElementById('filterHistMech').value;
+  let rows = [...state.history].reverse();
+  if (q) rows = rows.filter(h => h.machineName?.toLowerCase().includes(q) || h.desc?.toLowerCase().includes(q) || h.notes?.toLowerCase().includes(q));
+  if (fm) rows = rows.filter(h => h.mech === fm);
+  const container = document.getElementById('histList');
+  if (!rows.length) { container.innerHTML = `<div class="empty"><div class="empty-icon">📜</div><p>Sin registros en el historial</p></div>`; return; }
+  container.innerHTML = rows.map(h => `
+    <div class="hist-item">
+      <div class="hist-date">${h.execDate || h.date}</div>
+      <div class="hist-body">
+        <div class="hist-title">${h.machineName} — ${h.desc}</div>
+        <div class="hist-meta">
+          ${h.type} · <span class="badge badge-blue" style="font-size:10px;padding:2px 7px">${h.mech}</span>
+          ${h.notes ? `· ${h.notes}` : ''}
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+// ── MODALS ──────────────────────────────────────────────────────
+function openModal(type) {
+  if (type === 'task') {
+    editingTaskId = null;
+    document.getElementById('modalTaskTitle').textContent = 'Nueva tarea de mantenimiento';
+    document.getElementById('tDate').value = today();
+    document.getElementById('tDesc').value = '';
+    document.getElementById('tNotes').value = '';
+    document.getElementById('tPriority').value = 'normal';
+    document.getElementById('tFreq').value = '30';
+    document.getElementById('tMech').value = 'Nolberto';
+    populateMachineSelect();
+    document.getElementById('modalTask').style.display = 'flex';
+  }
+  if (type === 'machine') {
+    document.getElementById('mName').value = '';
+    document.getElementById('mBrand').value = '';
+    document.getElementById('mModel').value = '';
+    document.getElementById('mSerial').value = '';
+    document.getElementById('mYear').value = '';
+    document.getElementById('mNotes').value = '';
+    document.getElementById('mStatus').value = 'activa';
+    document.getElementById('mEditId').value = '';
+    document.getElementById('modalMachine').style.display = 'flex';
+  }
+}
+function closeModal(type) { document.getElementById('modal'+capitalize(type)).style.display = 'none'; }
+function capitalize(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
+
+function populateMachineSelect() {
+  const sel = document.getElementById('tMachine');
+  sel.innerHTML = state.machines.filter(m=>m.status==='activa').map(m => `<option value="${m.id}">${m.name}</option>`).join('');
+}
+
+// ── SAVE TASK ──────────────────────────────────────────────────
+function saveTask() {
+  const machineId = document.getElementById('tMachine').value;
+  const desc = document.getElementById('tDesc').value.trim();
+  const date = document.getElementById('tDate').value;
+  if (!machineId || !desc || !date) { showToast('Completa los campos obligatorios', true); return; }
+
+  const task = {
+    id: editingTaskId || uid(),
+    machineId,
+    type: document.getElementById('tType').value,
+    desc,
+    mech: document.getElementById('tMech').value,
+    freq: parseInt(document.getElementById('tFreq').value),
+    date,
+    priority: document.getElementById('tPriority').value,
+    notes: document.getElementById('tNotes').value.trim(),
+    status: 'active'
+  };
+
+  if (editingTaskId) {
+    const idx = state.tasks.findIndex(t => t.id === editingTaskId);
+    state.tasks[idx] = task;
+  } else {
+    state.tasks.push(task);
+  }
+  saveState(); closeModal('task'); render(); showToast('Tarea guardada ✓');
+}
+
+function editTask(id) {
+  const t = state.tasks.find(t => t.id === id);
+  if (!t) return;
+  editingTaskId = id;
+  populateMachineSelect();
+  document.getElementById('tMachine').value = t.machineId;
+  document.getElementById('tType').value = t.type;
+  document.getElementById('tDesc').value = t.desc;
+  document.getElementById('tMech').value = t.mech;
+  document.getElementById('tFreq').value = t.freq;
+  document.getElementById('tDate').value = t.date;
+  document.getElementById('tPriority').value = t.priority;
+  document.getElementById('tNotes').value = t.notes || '';
+  document.getElementById('modalTaskTitle').textContent = 'Editar tarea';
+  document.getElementById('modalTask').style.display = 'flex';
+}
+
+function deleteTask(id) {
+  if (!confirm('¿Eliminar esta tarea?')) return;
+  state.tasks = state.tasks.filter(t => t.id !== id);
+  saveState(); render(); showToast('Tarea eliminada');
+}
+
+// ── COMPLETE TASK ──────────────────────────────────────────────
+function openComplete(id) {
+  document.getElementById('cTaskId').value = id;
+  document.getElementById('cDate').value = today();
+  document.getElementById('cNotes').value = '';
+  const t = state.tasks.find(t => t.id === id);
+  if (t) document.getElementById('cMech').value = t.mech;
+  document.getElementById('modalComplete').style.display = 'flex';
+}
+
+function completeTask() {
+  const id = document.getElementById('cTaskId').value;
+  const execDate = document.getElementById('cDate').value;
+  const notes = document.getElementById('cNotes').value.trim();
+  const mech = document.getElementById('cMech').value;
+  const t = state.tasks.find(t => t.id === id);
+  if (!t) return;
+
+  // Log history
+  state.history.push({
+    id: uid(), taskId: id,
+    machineName: getMachineName(t.machineId),
+    type: t.type, desc: t.desc,
+    mech, execDate, date: today(), notes
+  });
+
+  // Reprogramar o cerrar
+  if (t.freq > 0) {
+    const base = new Date(execDate);
+    base.setDate(base.getDate() + t.freq);
+    t.date = fmtDate(base);
+    t.mech = mech;
+  } else {
+    t.status = 'done';
+  }
+
+  saveState(); closeModal('complete'); render();
+  showToast('Intervención registrada ✓');
+}
+
+// ── MACHINES CRUD ──────────────────────────────────────────────
+function saveMachine() {
+  const name = document.getElementById('mName').value.trim();
+  const type = document.getElementById('mType').value;
+  if (!name) { showToast('Ingresa el nombre de la máquina', true); return; }
+  const editId = document.getElementById('mEditId').value;
+  const m = {
+    id: editId || uid(), name, type,
+    brand: document.getElementById('mBrand').value.trim(),
+    model: document.getElementById('mModel').value.trim(),
+    serial: document.getElementById('mSerial').value.trim(),
+    year: document.getElementById('mYear').value.trim(),
+    status: document.getElementById('mStatus').value,
+    notes: document.getElementById('mNotes').value.trim()
+  };
+  if (editId) { const idx = state.machines.findIndex(m=>m.id===editId); state.machines[idx] = m; }
+  else state.machines.push(m);
+  saveState(); closeModal('machine'); render(); showToast('Máquina guardada ✓');
+}
+
+function editMachine(id) {
+  const m = state.machines.find(m=>m.id===id); if (!m) return;
+  document.getElementById('mName').value = m.name;
+  document.getElementById('mType').value = m.type;
+  document.getElementById('mBrand').value = m.brand || '';
+  document.getElementById('mModel').value = m.model || '';
+  document.getElementById('mSerial').value = m.serial || '';
+  document.getElementById('mYear').value = m.year || '';
+  document.getElementById('mNotes').value = m.notes || '';
+  document.getElementById('mStatus').value = m.status || 'activa';
+  document.getElementById('mEditId').value = id;
+  document.getElementById('modalMachine').style.display = 'flex';
+}
+
+function deleteMachine(id) {
+  const hasTask = state.tasks.some(t => t.machineId === id && t.status === 'active');
+  if (hasTask && !confirm('Esta máquina tiene tareas activas. ¿Eliminar igual?')) return;
+  state.machines = state.machines.filter(m => m.id !== id);
+  saveState(); render(); showToast('Máquina eliminada');
+}
+
+// ── TABS ───────────────────────────────────────────────────────
+function switchTab(tab, el) {
+  ['tasks','machines','history'].forEach(t => document.getElementById('tab-'+t).style.display = 'none');
+  document.querySelectorAll('.tab').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-'+tab).style.display = '';
+  el.classList.add('active');
+  render();
+}
+
+// ── EXPORT CSV ─────────────────────────────────────────────────
+function exportCSV() {
+  const rows = [['Máquina','Tipo','Tarea','Mecánico','Frecuencia','Próxima fecha','Estado','Prioridad','Notas']];
+  state.tasks.filter(t=>t.status==='active').forEach(t => {
+    const st = getStatus(t.date);
+    rows.push([
+      getMachineName(t.machineId), getMachineType(t.machineId),
+      t.desc, t.mech, t.freq+'d', t.date,
+      st==='red'?'Vencido':st==='warn'?'Por vencer':'Al día',
+      t.priority, t.notes
+    ]);
+  });
+  const csv = rows.map(r => r.map(c=>`"${c}"`).join(',')).join('\n');
+  const a = document.createElement('a');
+  a.href = 'data:text/csv;charset=utf-8,\uFEFF' + encodeURIComponent(csv);
+  a.download = `mantenimiento_${today()}.csv`;
+  a.click();
+  showToast('CSV exportado ✓');
+}
+
+// ── TOAST ──────────────────────────────────────────────────────
+let toastTimer;
+function showToast(msg, err=false) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.style.background = err ? '#450a0a' : '#14532d';
+  t.style.borderColor = err ? 'var(--red)' : 'var(--green)';
+  t.style.color = err ? '#fca5a5' : '#86efac';
+  t.style.display = 'block';
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.style.display = 'none', 2800);
+}
+
+// ── RENDER ALL ─────────────────────────────────────────────────
+function render() {
+  renderKPI();
+  renderTasks();
+  renderMachines();
+  renderHistory();
+}
+
+// ── INIT ───────────────────────────────────────────────────────
+loadState();
+render();
+</script>
+</body>
+</html>
